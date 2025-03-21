@@ -6,8 +6,9 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
-from .models import Product
-from .serializers import ProductSerializer
+from .models import Category, Product, ProductImage
+from .serializers import ProductImageSerializer, ProductSerializer, CategorySerializer
+from rest_framework import permissions
 
 class ProductViewSet(viewsets.ModelViewSet):
     """
@@ -49,3 +50,29 @@ class ProductViewSet(viewsets.ModelViewSet):
             return Response({"detail": "No new arrivals found."}, status=status.HTTP_404_NOT_FOUND)
         serializer = self.get_serializer(new_arrivals, many=True)
         return Response(serializer.data)
+    
+class ProductImageViewSet(viewsets.ModelViewSet):
+    """
+    Handles CRUD operations for product images.
+    Supports file uploads for new images.
+    """
+    queryset = ProductImage.objects.all()
+    serializer_class = ProductImageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Optionally filter by product if a query parameter is provided.
+        product_id = self.request.query_params.get('product')
+        queryset = super().get_queryset()
+        if product_id:
+            queryset = queryset.filter(product_id=product_id)
+        return queryset
+    
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    """
+    Handles CRUD operations for product categories.
+    """
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticated]

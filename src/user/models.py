@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 
@@ -8,6 +8,22 @@ class CustomUser(AbstractUser):
     profile_image_url = models.URLField(blank=True, null=True)
     # Personalization metadata (e.g., user preferences)
     preferences = models.JSONField(blank=True, null=True)
+
+    # Override groups and user_permissions to avoid conflicts
+    groups = models.ManyToManyField(
+        Group,
+        related_name="customuser_set",
+        blank=True,
+        help_text="The groups this user belongs to.",
+        verbose_name="groups",
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name="customuser_set",
+        blank=True,
+        help_text="Specific permissions for this user.",
+        verbose_name="user permissions",
+    )
 
     def clean(self):
         super().clean()
@@ -20,7 +36,6 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
-
 
 ACTION_CHOICES = [
     ('login', 'Login'),
