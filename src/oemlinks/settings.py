@@ -111,6 +111,11 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
+# Celery settings
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Redis as the message broker
+CELERY_ACCEPT_CONTENT = ['json']  # Accept JSON-encoded messages
+CELERY_TASK_SERIALIZER = 'json'  # Serialize tasks in JSON format
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
