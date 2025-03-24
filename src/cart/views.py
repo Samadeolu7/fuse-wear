@@ -15,8 +15,9 @@ class CartViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Return the cart(s) for the logged-in user
-        return Cart.objects.filter(user=self.request.user)
+        # Return the authenticated user's cart
+        user = self.request.user
+        return Cart.objects.filter(user=user)
 
     @method_decorator(cache_page(30))
     def retrieve(self, request, *args, **kwargs):
@@ -26,11 +27,13 @@ class CartViewSet(viewsets.ModelViewSet):
 
 class CartItemViewSet(viewsets.ModelViewSet):
     """
-    Manages individual items within a cart.
+    Manages cart items for the authenticated user.
     """
     serializer_class = CartItemSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Return cart items for the authenticated user's cart
-        return CartItem.objects.filter(cart__user=self.request.user)
+        # Filter cart items by the authenticated user's cart
+        user = self.request.user
+        cart, created = Cart.objects.get_or_create(user=user)
+        return CartItem.objects.filter(cart=cart)
