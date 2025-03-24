@@ -11,8 +11,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
     def validate(self, data):
-        if data['password'] != data['confirm_password']:
-            raise serializers.ValidationError("Passwords do not match.")
+        # Check if both password and confirm_password are provided
+        password = data.get('password')
+        confirm_password = data.get('confirm_password')
+    
+        if password or confirm_password:
+            if password != confirm_password:
+                raise serializers.ValidationError("Passwords do not match.")
         return data
 
     def create(self, validated_data):
