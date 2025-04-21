@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import ping
+from .views import landing_page
 
 urlpatterns = [
-    path('ping/', ping, name='ping'),
+    path("", landing_page, name="landing_page"),
 ]
