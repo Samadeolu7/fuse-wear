@@ -2,33 +2,22 @@ from django.utils import timezone
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+# from rest_framework.schemas import exclude_schema
 from product.models import Category, Product
 from product.serializers import CategorySerializer, ProductSerializer
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 
-@extend_schema(
-    summary="Landing Page Data",
-    description=(
-        "Returns data for the landing page, including:\n"
-        "- All categories\n"
-        "- 8 bestsellers\n"
-        "- 8 trending products\n"
-        "- 8 new arrivals"
-    ),
-    responses={
-        200: OpenApiResponse(
-            response={
-                "categories": CategorySerializer(many=True),
-                "bestsellers": ProductSerializer(many=True),
-                "trending": ProductSerializer(many=True),
-                "new_arrivals": ProductSerializer(many=True),
-            },
-            description="Landing page data successfully retrieved.",
-        ),
-        404: OpenApiResponse(description="Data not found."),
-    },
-)
+#define ping
+
+def ping(request):
+    """
+    Simple ping endpoint to check if the server is running.
+    """
+    return Response({"message": "pong"}, status=status.HTTP_200_OK)
+
+
+
 @api_view(['GET'])
 def landing_page(request):
     """
