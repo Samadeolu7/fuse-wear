@@ -30,7 +30,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         bestsellers = Product.objects.order_by('-sales_count')[:10]
         if not bestsellers.exists():
             #return empty list if no bestsellers are found and 200 status
-            return Response([], status=status.HTTP_200_OK)
+            return Response({'data': []}, status=status.HTTP_200_OK)
         serializer = self.get_serializer(bestsellers, many=True)
         return Response(serializer.data)
 
@@ -40,7 +40,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         trending = Product.objects.order_by('-trending_score')[:10]
         if not trending.exists():
             #return empty list if no trending products are found and 200 status
-            return Response([], status=status.HTTP_200_OK)
+            return Response({'data': []}, status=status.HTTP_200_OK)
         serializer = self.get_serializer(trending, many=True)
         return Response(serializer.data)
 
@@ -50,7 +50,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         new_arrivals = Product.objects.filter(release_date__lte=timezone.now()).order_by('-release_date')[:10]
         if not new_arrivals.exists():
             #return empty list if no new arrivals are found and 200 status
-            return Response([], status=status.HTTP_200_OK)
+            return Response({'data': []}, status=status.HTTP_200_OK)
         serializer = self.get_serializer(new_arrivals, many=True)
         return Response(serializer.data)
     
