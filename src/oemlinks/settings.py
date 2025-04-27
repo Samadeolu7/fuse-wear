@@ -138,6 +138,7 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+AUTH_USER_MODEL = 'user.CustomUser'
 
 # Celery settings
 CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Redis as the message broker

@@ -41,7 +41,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     def activities(self, request, pk=None):
         """Return the activity log for a specific user."""
         user = self.get_object()
-        activities = user.activities.all()
+        activities = user.activities.all().order_by('-timestamp')
         serializer = UserActivitySerializer(activities, many=True)
         return Response(serializer.data)
 

@@ -104,3 +104,37 @@ class UserActivityAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["action"], "login")
         self.assertEqual(response.data["ip_address"], "127.0.0.1")
+
+class LoginAPITestCase(APITestCase):
+    def setUp(self):
+        # Create a test user
+        self.user = CustomUser.objects.create_user(
+            username="testuser",
+            email="testuser@example.com",
+            password="password123"
+        )
+        self.login_url = reverse("token_obtain_pair")  # URL for the login endpoint
+        print(self.login_url)
+        self.client = APIClient()
+
+    def test_login_success(self):
+        """Test login with valid credentials."""
+        data = {
+            "username": "testuser",  # Use "username" instead of "email"
+            "password": "password123"
+        }
+        response = self.client.post(self.login_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("access", response.data)
+        self.assertIn("refresh", response.data)
+
+    def test_login_failure_invalid_credentials(self):
+        """Test login with invalid credentials."""
+        data = {
+            "username": "testuser",  # Use "username" instead of "email"
+            "password": "wrongpassword"
+        }
+        response = self.client.post(self.login_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertIn("detail", response.data)
+        self.assertEqual(response.data["detail"], "No active account found with the given credentials.")
