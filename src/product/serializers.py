@@ -11,13 +11,8 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = ('id', 'image_url', 'media_type', 'alt_text', 'is_primary', 'created_at', 'updated_at')
+        fields = ('id', 'image', 'media_type', 'alt_text', 'is_primary', 'created_at', 'updated_at')
         read_only_fields = ('id', 'created_at', 'updated_at')
-
-    def validate_image_url(self, value):
-        if not value.startswith("http"):
-            raise serializers.ValidationError("Image URL must be a valid URL.")
-        return value
 
 
 class ProductSerializer(serializers.ModelSerializer):

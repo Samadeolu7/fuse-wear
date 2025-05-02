@@ -61,8 +61,7 @@ class ProductImageViewSet(viewsets.ModelViewSet):
     """
     queryset = ProductImage.objects.all()
     serializer_class = ProductImageSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
+    
     def get_queryset(self):
         # Optionally filter by product if a query parameter is provided.
         product_id = self.request.query_params.get('product')
