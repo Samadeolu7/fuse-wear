@@ -60,9 +60,11 @@ class Product(models.Model):
         return self.current_stock > 0
 
 
+from django.db import models
+
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
-    image_url = models.URLField(validators=[URLValidator()])
+    image = models.ImageField(upload_to="product_images/", default="10.jpg")
     media_type = models.CharField(max_length=50, help_text="e.g., image/jpeg, image/png")
     alt_text = models.CharField(max_length=255, blank=True, default="Image")
     is_primary = models.BooleanField(default=False)
@@ -70,11 +72,6 @@ class ProductImage(models.Model):
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['product'], condition=models.Q(is_primary=True), name='unique_primary_image_per_product')
-        ]
 
     def __str__(self):
         return f"Image for {self.product.name} ({'Primary' if self.is_primary else 'Secondary'})"
