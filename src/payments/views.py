@@ -15,8 +15,27 @@ from django.conf import settings
 import stripe
 
 
+import stripe
+from django.conf import settings
+
+from drf_spectacular.utils import extend_schema
+
 class CreatePaymentIntentView(APIView):
+    @extend_schema(
+        request=CreatePaymentIntentSerializer,
+        responses={
+            200: {
+                "type": "object",
+                "properties": {
+                    "clientSecret": {"type": "string", "description": "The client secret for the payment intent."}
+                },
+            }
+        },
+        description="Create a Stripe Payment Intent for one-time payments.",
+    )
     def post(self, request):
+        stripe.api_key = settings.STRIPE_SECRET_KEY  # Set the API key
+
         serializer = CreatePaymentIntentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
