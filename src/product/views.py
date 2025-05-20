@@ -6,8 +6,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
-from .models import Category, Product, ProductImage
-from .serializers import ProductImageSerializer, ProductSerializer, CategorySerializer
+from .models import Category, Product, ProductImage, Tag
+from .serializers import ProductImageSerializer, ProductSerializer, CategorySerializer, TagSerializer
 from rest_framework import permissions
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -20,7 +20,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.select_related('category').prefetch_related('images')
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['category', 'is_launch', 'current_stock']
+    filterset_fields = ['category', 'is_launch', 'current_stock', 'tags']
     search_fields = ['name', 'description']
     ordering_fields = ['price', 'sales_count', 'release_date']
 
@@ -78,3 +78,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [permissions.IsAuthenticated]
+
+class TagViewSet(viewsets.ModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]

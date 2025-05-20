@@ -1,11 +1,12 @@
 from rest_framework import serializers
 
+from .models import Payment
+
 class CreatePaymentIntentSerializer(serializers.Serializer):
     amount = serializers.IntegerField(min_value=50)  # amount in cents
     currency = serializers.CharField(default="aud")
     metadata = serializers.DictField(child=serializers.CharField(), required=False)
 
-from .models import Payment
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:

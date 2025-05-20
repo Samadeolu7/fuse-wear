@@ -14,7 +14,7 @@ import os
 from pathlib import Path
 from datetime import timedelta
 
-import os, stripe
+import stripe
 from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
@@ -54,6 +54,7 @@ INSTALLED_APPS = [
 
     "drf_spectacular",
     "rest_framework",
+    'rest_framework_simplejwt.token_blacklist',
     "corsheaders",
     "django_filters",
 

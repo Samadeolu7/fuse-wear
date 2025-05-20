@@ -1,97 +1,115 @@
 import os
 from django.core.management.base import BaseCommand
-from product.models import Category, Product, ProductImage
+from product.models import Category, Product, ProductImage, Tag
 from django.utils.timezone import now
 from django.conf import settings
 
 class Command(BaseCommand):
-    help = "Create 5 sample products with images"
+    help = "Delete all existing products and categories, then create new ones along with tags."
 
     def handle(self, *args, **kwargs):
+        # Delete all existing products, categories, and tags
+        self.stdout.write("Deleting all existing products, categories, and tags...")
+        ProductImage.objects.all().delete()
+        Product.objects.all().delete()
+        Category.objects.all().delete()
+        Tag.objects.all().delete()
+        self.stdout.write(self.style.SUCCESS("All existing products, categories, and tags deleted successfully."))
+
         # Ensure the media directory exists
         media_dir = os.path.join(settings.MEDIA_ROOT, "product_images")
         os.makedirs(media_dir, exist_ok=True)
 
         # Create Categories
-        electronics = Category.objects.get_or_create(name="Electronics", description="Electronic items")[0]
-        fashion = Category.objects.get_or_create(name="Fashion", description="Clothing and accessories")[0]
+        categories = {
+            "Men": "Men's clothing and accessories",
+            "Women": "Women's clothing and accessories",
+            "Children": "Children's clothing and accessories",
+            "Accessories": "General accessories",
+        }
+        category_objects = {}
+        for name, description in categories.items():
+            category, _ = Category.objects.get_or_create(name=name, description=description)
+            category_objects[name] = category
 
-        # Create Products
+        # Create Tags
+        tags = [
+            {"name": "Size", "value": "Small"},
+            {"name": "Size", "value": "Medium"},
+            {"name": "Size", "value": "Large"},
+            {"name": "Color", "value": "Red"},
+            {"name": "Color", "value": "Blue"},
+            {"name": "Color", "value": "Green"},
+        ]
+        tag_objects = {}
+        for tag_data in tags:
+            tag, _ = Tag.objects.get_or_create(name=tag_data["name"], value=tag_data["value"])
+            tag_objects[f"{tag_data['name']}_{tag_data['value']}"] = tag
+
+        # Create Products for Men and Women
         products = [
             {
-                "category": electronics,
-                "name": "Smartphone1",
-                "description": "A high-end smartphone with great features.",
-                "price": 999.99,
-                "sales_count": 500,
-                "views_count": 1000,
-                "trending_score": 95.0,
+                "category": category_objects["Men"],
+                "name": "Men's T-Shirt",
+                "description": "A comfortable men's t-shirt.",
+                "price": 19.99,
+                "sales_count": 100,
+                "views_count": 200,
+                "trending_score": 80.0,
                 "current_stock": 50,
                 "is_launch": True,
                 "release_date": now(),
+                "tags": [tag_objects["Size_Medium"], tag_objects["Color_Blue"]],
                 "images": [
-                    {"image_name": "1.jpg", "is_primary": True},
-                    {"image_name": "2.jpg", "is_primary": False},
+                    {"image_name": "mens_tshirt.jpg", "is_primary": True},
                 ],
             },
             {
-                "category": electronics,
-                "name": "Laptop1",
-                "description": "A powerful laptop for professionals.",
-                "price": 1999.99,
-                "sales_count": 300,
-                "views_count": 800,
-                "trending_score": 85.0,
-                "current_stock": 30,
-                "is_launch": False,
+                "category": category_objects["Men"],
+                "name": "Men's Jeans",
+                "description": "Stylish men's jeans.",
+                "price": 49.99,
+                "sales_count": 80,
+                "views_count": 150,
+                "trending_score": 70.0,
+                "current_stock": 40,
+                "is_launch": True,
                 "release_date": now(),
+                "tags": [tag_objects["Size_Large"], tag_objects["Color_Blue"]],
                 "images": [
-                    {"image_name": "3.jpg", "is_primary": True},
+                    {"image_name": "mens_jeans.jpg", "is_primary": True},
                 ],
             },
             {
-                "category": fashion,
-                "name": "Designer Jacket1",
-                "description": "A stylish designer jacket for winter.",
-                "price": 199.99,
-                "sales_count": 200,
-                "views_count": 500,
+                "category": category_objects["Women"],
+                "name": "Women's Dress",
+                "description": "A beautiful women's dress.",
+                "price": 39.99,
+                "sales_count": 120,
+                "views_count": 250,
+                "trending_score": 90.0,
+                "current_stock": 30,
+                "is_launch": True,
+                "release_date": now(),
+                "tags": [tag_objects["Size_Small"], tag_objects["Color_Red"]],
+                "images": [
+                    {"image_name": "womens_dress.jpg", "is_primary": True},
+                ],
+            },
+            {
+                "category": category_objects["Women"],
+                "name": "Women's Handbag",
+                "description": "A stylish women's handbag.",
+                "price": 59.99,
+                "sales_count": 60,
+                "views_count": 100,
                 "trending_score": 75.0,
                 "current_stock": 20,
                 "is_launch": True,
                 "release_date": now(),
+                "tags": [tag_objects["Color_Green"]],
                 "images": [
-                    {"image_name": "4.jpg", "is_primary": True},
-                ],
-            },
-            {
-                "category": electronics,
-                "name": "Smartwatch1",
-                "description": "A smartwatch with fitness tracking features.",
-                "price": 299.99,
-                "sales_count": 150,
-                "views_count": 400,
-                "trending_score": 70.0,
-                "current_stock": 25,
-                "is_launch": True,
-                "release_date": now(),
-                "images": [
-                    {"image_name": "5.jpg", "is_primary": True},
-                ],
-            },
-            {
-                "category": fashion,
-                "name": "Sneakers1",
-                "description": "Comfortable and stylish sneakers.",
-                "price": 99.99,
-                "sales_count": 100,
-                "views_count": 300,
-                "trending_score": 60.0,
-                "current_stock": 40,
-                "is_launch": False,
-                "release_date": now(),
-                "images": [
-                    {"image_name": "6.jpg", "is_primary": True},
+                    {"image_name": "womens_handbag.jpg", "is_primary": True},
                 ],
             },
         ]
@@ -112,10 +130,12 @@ class Command(BaseCommand):
                 },
             )
 
+            # Add tags to the product
+            product.tags.set(product_data["tags"])
+
             # Add images for the product
             for image_data in product_data["images"]:
                 image_path = os.path.join(media_dir, image_data["image_name"])
-                print(f"Checking for image file: {image_path}")
                 if not os.path.exists(image_path):
                     self.stdout.write(self.style.WARNING(f"Image file '{image_data['image_name']}' not found. Skipping."))
                     continue
@@ -126,4 +146,4 @@ class Command(BaseCommand):
                     is_primary=image_data["is_primary"],
                 )
 
-        self.stdout.write(self.style.SUCCESS("5 sample products with images created successfully!"))
+        self.stdout.write(self.style.SUCCESS("Categories, products, and tags created successfully!"))

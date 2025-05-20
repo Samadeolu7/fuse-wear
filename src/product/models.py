@@ -15,6 +15,31 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Tag(models.Model):
+    """
+    Represents a tag for categorizing products.
+    for example name could be color or size and value could be red or small
+    """
+    name = models.CharField(max_length=50)
+    value = models.CharField(max_length=50, default="default")
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name_plural = "Tags"
+        unique_together = ('name', 'value')
+
+    def __str__(self):
+        return self.name
+    def clean(self):
+        if self.name == self.value:
+            raise ValidationError("Name and value cannot be the same.")
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
 
 
 class Product(models.Model):
@@ -35,6 +60,9 @@ class Product(models.Model):
     current_stock = models.PositiveIntegerField(default=0, db_index=True)
     is_launch = models.BooleanField(default=False, db_index=True)
     release_date = models.DateTimeField(blank=True, null=True, db_index=True)
+
+    # Tags for product categorization
+    tags = models.ManyToManyField(Tag, blank=True, related_name="products")
 
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
