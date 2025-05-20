@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, URLValidator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from decimal import Decimal
 
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -46,7 +47,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name="products")
     name = models.CharField(max_length=255)
     description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal(0.01))])
     
     # Metrics for dynamic sections
     sales_count = models.PositiveIntegerField(default=0, db_index=True)

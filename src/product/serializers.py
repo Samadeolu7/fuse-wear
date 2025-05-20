@@ -10,6 +10,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
+        fields = '__all__'
 
 
 class ProductImageSerializer(serializers.ModelSerializer):

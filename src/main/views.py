@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 # from rest_framework.schemas import exclude_schema
+from main.serializers import LandingPageSerializer
 from product.models import Category, Product
 from product.serializers import CategorySerializer, ProductSerializer
 from drf_spectacular.utils import extend_schema, OpenApiResponse
@@ -19,6 +20,7 @@ def ping(request):
 
 
 @api_view(['GET'])
+@extend_schema(responses=LandingPageSerializer)
 def landing_page(request):
     """
     Returns data for the landing page:
