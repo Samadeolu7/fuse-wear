@@ -45,7 +45,7 @@ class CartItemSerializer(serializers.ModelSerializer):
         return value
 
 class CartSerializer(serializers.ModelSerializer):
-    items = CartItemSerializer(many=True, read_only=True)
+    items = CartItemSerializer(many=True)
     total = serializers.SerializerMethodField()
 
     class Meta:

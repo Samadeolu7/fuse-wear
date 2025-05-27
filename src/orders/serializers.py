@@ -23,8 +23,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'order', 'product')
 
 class OrderSerializer(serializers.ModelSerializer):
-    items = OrderItemSerializer(many=True, read_only=True)
-    manufacturer = ManufacturerSerializer(read_only=True)
+    items = OrderItemSerializer(many=True)
+    manufacturer = ManufacturerSerializer()
     manufacturer_id = serializers.PrimaryKeyRelatedField(
         queryset=Manufacturer.objects.all(), source='manufacturer', write_only=True, required=False
     )
