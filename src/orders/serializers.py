@@ -24,15 +24,12 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
-    manufacturer = ManufacturerSerializer()
-    manufacturer_id = serializers.PrimaryKeyRelatedField(
-        queryset=Manufacturer.objects.all(), source='manufacturer', write_only=True, required=False
-    )
+
 
     class Meta:
         model = Order
         fields = [
-            'id', 'user', 'manufacturer', 'manufacturer_id', 'payment_intent_id', 'amount', 'currency',
+            'id', 'user', 'payment_intent_id', 'amount', 'currency',
             'shipping_info', 'subtotal', 'shipping', 'total', 'status', 'tracking_number', 'tracking_url',
             'created_at', 'items'
         ]
