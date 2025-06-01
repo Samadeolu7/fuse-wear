@@ -8,19 +8,19 @@ class ManufacturerSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
     product_id = serializers.PrimaryKeyRelatedField(
         queryset=OrderItem._meta.get_field('product').related_model.objects.all(),
         source='product',
         write_only=True
     )
+    product = ProductSerializer(read_only=True)
+    order = serializers.PrimaryKeyRelatedField(read_only=True) 
 
     class Meta:
         model = OrderItem
         fields = [
-            'id', 'order', 'product', 'product_id', 'name', 'quantity', 'price', 'color', 'size'
+            'id', 'order','product', 'product_id', 'name', 'quantity', 'price', 'color', 'size'
         ]
-        read_only_fields = ('id', 'order', 'product')
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
@@ -33,4 +33,10 @@ class OrderSerializer(serializers.ModelSerializer):
             'shipping_info', 'subtotal', 'shipping', 'total', 'status', 'tracking_number', 'tracking_url',
             'created_at', 'items'
         ]
-        read_only_fields = ('id', 'created_at', 'items', 'manufacturer')
+
+    def create(self, validated_data):
+        items_data = validated_data.pop('items')
+        order = Order.objects.create(**validated_data)
+        for item_data in items_data:
+            OrderItem.objects.create(order=order, **item_data)
+        return order

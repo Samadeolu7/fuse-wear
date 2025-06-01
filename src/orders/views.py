@@ -22,7 +22,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Order.objects.all()
         return Order.objects.filter(user=user)
 
-class OrderItemViewSet(viewsets.ModelViewSet):
-    queryset = OrderItem.objects.all().select_related('order', 'product')
-    serializer_class = OrderItemSerializer
-    permission_classes = [permissions.IsAuthenticated]
+# class OrderItemViewSet(viewsets.ModelViewSet):
+#     queryset = OrderItem.objects.all().select_related('order', 'product')
+#     serializer_class = OrderItemSerializer
+#     permission_classes = [permissions.IsAuthenticated]
