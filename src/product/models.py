@@ -41,7 +41,14 @@ class Tag(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
 
+class Manufacturer(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    address = models.TextField(blank=True, null=True)
+    contact_email = models.EmailField(blank=True, null=True)
+    contact_phone = models.CharField(max_length=20, blank=True, null=True)
 
+    def __str__(self):
+        return self.name
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name="products")
@@ -63,7 +70,9 @@ class Product(models.Model):
     release_date = models.DateTimeField(blank=True, null=True, db_index=True)
 
     # Tags for product categorization
-    tags = models.ManyToManyField(Tag, blank=True, related_name="products")
+    tags = models.ManyToManyField(Tag, blank=True, related_name="products", through='ProductTag')
+    # Manufacturer information
+    manufacturer = models.ForeignKey(Manufacturer, on_delete=models.SET_NULL, null=True, related_name="products")
 
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -88,8 +97,17 @@ class Product(models.Model):
     def is_in_stock(self):
         return self.current_stock > 0
 
+class ProductTag(models.Model):
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    tag = models.ForeignKey('Tag', on_delete=models.CASCADE)
+    image = models.ForeignKey('ProductImage', on_delete=models.SET_NULL, null=True, blank=True,
+                              help_text="Select an image that represents this tag for this product.")
 
-from django.db import models
+    class Meta:
+        unique_together = ('product', 'tag')
+
+    def __str__(self):
+        return f"{self.product.name} - {self.tag.name} ({self.tag.value})"
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
@@ -104,3 +122,4 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.product.name} ({'Primary' if self.is_primary else 'Secondary'})"
+    

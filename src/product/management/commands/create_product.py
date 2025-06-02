@@ -1,6 +1,6 @@
 import os
 from django.core.management.base import BaseCommand
-from product.models import Category, Product, ProductImage, Tag
+from product.models import Category, Manufacturer, Product, ProductImage, Tag
 from django.utils.timezone import now
 from django.conf import settings
 
@@ -46,6 +46,14 @@ class Command(BaseCommand):
             tag, _ = Tag.objects.get_or_create(name=tag_data["name"], value=tag_data["value"])
             tag_objects[f"{tag_data['name']}_{tag_data['value']}"] = tag
 
+        manufacturer, _ = Manufacturer.objects.get_or_create(
+            name="Demo Manufacturer",
+            defaults={
+                "address": "123 Demo Street",
+                "contact_email": "demo@example.com",
+                "contact_phone": "1234567890"
+            }
+        )
         # Create Products for Men and Women
         products = [
             {
@@ -63,6 +71,7 @@ class Command(BaseCommand):
                 "images": [
                     {"image_name": "mens_tshirt.jpg", "is_primary": True},
                 ],
+                "manufacturer": manufacturer,
             },
             {
                 "category": category_objects["Men"],
@@ -79,6 +88,7 @@ class Command(BaseCommand):
                 "images": [
                     {"image_name": "mens_jeans.jpg", "is_primary": True},
                 ],
+                "manufacturer": manufacturer,
             },
             {
                 "category": category_objects["Women"],
@@ -95,6 +105,7 @@ class Command(BaseCommand):
                 "images": [
                     {"image_name": "womens_dress.jpg", "is_primary": True},
                 ],
+                "manufacturer": manufacturer,
             },
             {
                 "category": category_objects["Women"],
@@ -111,6 +122,7 @@ class Command(BaseCommand):
                 "images": [
                     {"image_name": "womens_handbag.jpg", "is_primary": True},
                 ],
+                "manufacturer": manufacturer,
             },
         ]
 
@@ -118,6 +130,7 @@ class Command(BaseCommand):
             product, created = Product.objects.get_or_create(
                 category=product_data["category"],
                 name=product_data["name"],
+                manufacturer=product_data["manufacturer"],
                 defaults={
                     "description": product_data["description"],
                     "price": product_data["price"],

@@ -1,11 +1,8 @@
 from rest_framework import viewsets, permissions
-from .models import Manufacturer, Order, OrderItem
-from .serializers import ManufacturerSerializer, OrderSerializer, OrderItemSerializer
+from .models import Order, OrderItem
+from .serializers import OrderSerializer, OrderItemSerializer
 
-class ManufacturerViewSet(viewsets.ModelViewSet):
-    queryset = Manufacturer.objects.all()
-    serializer_class = ManufacturerSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all().select_related('manufacturer', 'user').prefetch_related('items')

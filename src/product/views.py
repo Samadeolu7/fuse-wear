@@ -6,8 +6,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
-from .models import Category, Product, ProductImage, Tag
-from .serializers import ProductImageSerializer, ProductSerializer, CategorySerializer, TagSerializer
+from .models import Category, Manufacturer, Product, ProductImage, Tag
+from .serializers import ManufacturerSerializer, ProductImageSerializer, ProductSerializer, CategorySerializer, TagSerializer
 from rest_framework import permissions
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -82,4 +82,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+class ManufacturerViewSet(viewsets.ModelViewSet):
+    queryset = Manufacturer.objects.all()
+    serializer_class = ManufacturerSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
