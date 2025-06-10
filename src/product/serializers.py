@@ -75,7 +75,7 @@ class ProductSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             "id", "sales_count", "trending_score",
-            "created_at", "updated_at"
+            "created_at", "updated_at","product_tags", "views_count"
         )
 
     def create(self, validated_data):
