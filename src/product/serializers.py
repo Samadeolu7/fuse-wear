@@ -91,6 +91,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
         # Create any ProductTag entries (each with optional nested image)
         for tag_dict in product_tags_data:
+            print("tag_dict:", tag_dict)  # <-- Add this line
             tag_dict["product"] = product
             nested = ProductTagSerializer(data=tag_dict)
             nested.is_valid(raise_exception=True)
