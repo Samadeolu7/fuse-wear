@@ -22,6 +22,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 
 class ProductTagSerializer(serializers.ModelSerializer):
+    product = serializers.PrimaryKeyRelatedField(read_only=True)
     tag_id = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         source="tag",
