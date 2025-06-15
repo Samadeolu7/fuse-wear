@@ -50,6 +50,7 @@ class ProductTagSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, required=False)
     product_tags = ProductTagSerializer(many=True, required=False)
+    tags = TagSerializer(many=True, read_only=True)  # <-- Add this line
 
     category = serializers.StringRelatedField(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(
@@ -75,7 +76,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "product_tags", "manufacturer", "manufacturer_id"
         )
         read_only_fields = (
-            "id", "sales_count", "trending_score",
+            "id", "sales_count", "trending_score", "tags"
             "created_at", "updated_at","product_tags", "views_count"
         )
 
