@@ -73,7 +73,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "aggregated_order_info", "current_stock", "is_launch",
             "release_date", "created_at", "updated_at",
             "images", "category", "category_id",
-            "product_tags", "manufacturer", "manufacturer_id"
+            "tags", "product_tags","manufacturer", "manufacturer_id"
         )
         read_only_fields = (
             "id", "sales_count", "trending_score", "tags"

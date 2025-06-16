@@ -64,20 +64,19 @@ def stripe_webhook(request):
     if event['type'] == 'payment_intent.succeeded':
         intent = event['data']['object']
         order_id = intent.metadata.get("order_id")
-        user_id = intent.metadata.get("user_id")  # Optional: Pass user_id in metadata
+        user_id = intent.metadata.get("user_id")
 
-        # Save payment data to the database
         Payment.objects.create(
             user_id=user_id,
             order_id=order_id,
             stripe_payment_intent_id=intent.id,
-            amount=intent.amount / 100,  # Convert cents to dollars
+            amount=intent.amount / 100,
             currency=intent.currency,
             status=intent.status,
         )
     elif event['type'] == 'payment_intent.payment_failed':
         intent = event['data']['object']
-        # Handle failed payment (optional)
+        
         Payment.objects.create(
             stripe_payment_intent_id=intent.id,
             amount=intent.amount / 100,
