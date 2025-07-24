@@ -3,14 +3,71 @@ from rest_framework import serializers
 from .models import Cart, CartItem
 from product.models import Product
 
+class CartItemOutputSerializer(serializers.Serializer):
+    """
+    Serializer for cart item output representation.
+    """
+    id = serializers.IntegerField(help_text="Cart item ID")
+    cartItemId = serializers.CharField(help_text="String representation of cart item ID")
+    name = serializers.CharField(help_text="Product name")
+    price = serializers.CharField(help_text="Product price as string")
+    description = serializers.CharField(help_text="Product description")
+    category = serializers.CharField(help_text="Product category name")
+    tags = serializers.ListField(
+        help_text="List of product tags",
+        child=serializers.DictField()
+    )
+    images = serializers.ListField(
+        help_text="List of product images",
+        child=serializers.DictField()
+    )
+    quantity = serializers.IntegerField(help_text="Quantity in cart")
+    selectedColor = serializers.CharField(help_text="Selected color variant")
+    selectedSize = serializers.CharField(help_text="Selected size variant")
+    current_stock = serializers.IntegerField(help_text="Current available stock")
+    created_at = serializers.DateTimeField(help_text="Product creation timestamp")
+    updated_at = serializers.DateTimeField(help_text="Product last update timestamp")
+
 class CartItemSerializer(serializers.ModelSerializer):
-    product_id = serializers.IntegerField(write_only=True)
+    """
+    Serializer for cart items with complete product information.
+    """
+    product_id = serializers.IntegerField(
+        write_only=True,
+        help_text="ID of the product to add to cart"
+    )
+    quantity = serializers.IntegerField(
+        help_text="Quantity of the item",
+        min_value=1
+    )
+    selected_color = serializers.CharField(
+        help_text="Selected color variant",
+        required=False,
+        allow_blank=True
+    )
+    selected_size = serializers.CharField(
+        help_text="Selected size variant",
+        required=False,
+        allow_blank=True
+    )
     
     class Meta:
         model = CartItem
         fields = ('product_id', 'quantity', 'selected_color', 'selected_size')
 
     def validate(self, data):
+        """
+        Validate the cart item data.
+        
+        Args:
+            data (dict): The data to validate containing product_id and quantity
+            
+        Returns:
+            dict: The validated data with the product instance added
+            
+        Raises:
+            ValidationError: If product doesn't exist or quantity exceeds stock
+        """
         try:
             product = Product.objects.get(id=data['product_id'])
             if data.get('quantity', 1) > product.current_stock:
