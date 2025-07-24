@@ -4,51 +4,48 @@ from product.models import Product
 from product.serializers import ProductSerializer
 
 class CartItemSerializer(serializers.ModelSerializer):
-    # Include product details as nested representation
-    product = ProductSerializer()
+    product_details = ProductSerializer(source='product', read_only=True)
+    product_id = serializers.IntegerField(write_only=True)
+    cartItemId = serializers.SerializerMethodField()
     
     class Meta:
         model = CartItem
-        fields = ('id', 'product', 'quantity', 'added_at')
+        fields = (
+            'id', 'cartItemId', 'product_id', 'product_details',
+            'quantity', 'selected_color', 'selected_size', 'added_at'
+        )
+        read_only_fields = ('id', 'added_at')
 
-    def create(self, validated_data):
-        # Get the authenticated user's cart
-        user = self.context['request'].user
-        cart, created = Cart.objects.get_or_create(user=user)
+    def get_cartItemId(self, obj):
+        return str(obj.id)
 
-        # Check if the product already exists in the cart
-        product = validated_data['product']
-        existing_item = CartItem.objects.filter(cart=cart, product=product).first()
-        if existing_item:
-            self.instance = existing_item
-            self.instance.quantity += validated_data['quantity']
-            self.instance.save()
-            return self.instance
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        product_data = data.pop('product_details', {})
+        return {
+            **product_data,
+            'cartItemId': data['cartItemId'],
+            'quantity': data['quantity'],
+            'selectedColor': data['selected_color'],
+            'selectedSize': data['selected_size'],
+        }
 
-        # Associate the CartItem with the user's cart
-        validated_data['cart'] = cart
-        return super().create(validated_data)
-    
-    def validate_quantity(self, value):
-        product_id = self.initial_data.get('product_id')
-        if product_id:
-            try:
-                product_instance = Product.objects.get(id=product_id)
-            except Product.DoesNotExist:
-                raise serializers.ValidationError({"detail": "Product does not exist."})
-    
-            if value > product_instance.current_stock:
-                raise serializers.ValidationError({"detail": "Not enough stock available."})
-        return value
+    def validate(self, data):
+        try:
+            product = Product.objects.get(id=data['product_id'])
+            if data.get('quantity', 1) > product.current_stock:
+                raise serializers.ValidationError(
+                    f"Only {product.current_stock} items available"
+                )
+            data['product'] = product
+        except Product.DoesNotExist:
+            raise serializers.ValidationError("Product not found")
+        return data
 
 class CartSerializer(serializers.ModelSerializer):
-    items = CartItemSerializer(many=True)
-    total = serializers.SerializerMethodField()
+    items = CartItemSerializer(many=True, read_only=True)
 
     class Meta:
         model = Cart
-        fields = ('id', 'user', 'created_at', 'updated_at', 'meta_data', 'items', 'total')
-        read_only_fields = ('id', 'created_at', 'updated_at', 'total', 'user')
-
-    def get_total(self, obj):
-        return obj.get_total()
+        fields = ('id', 'items', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'created_at', 'updated_at')
