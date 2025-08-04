@@ -108,8 +108,13 @@ class CartItemSerializer(serializers.ModelSerializer):
         }
 
 class CartSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Cart model.
+    """
     items = CartItemSerializer(many=True, read_only=True)
+    user_id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Cart
-        fields = ('id', 'items')
+        fields = ('id', 'user_id', 'items')
+        read_only_fields = ('id', 'user_id')

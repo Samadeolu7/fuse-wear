@@ -22,8 +22,21 @@ class CartViewSet(viewsets.ModelViewSet):
     lookup_value_regex = '[0-9]+'  # Only accept digits for id
 
     def get_queryset(self):
-        cart, _ = Cart.objects.get_or_create(user=self.request.user)
-        return Cart.objects.filter(id=cart.id)
+        """Get the cart for the current user"""
+        return Cart.objects.filter(user=self.request.user)
+        
+    def create(self, request, *args, **kwargs):
+        """
+        Create or get cart for the current user.
+        Instead of creating a new cart, returns existing cart if one exists.
+        """
+        cart, created = Cart.objects.get_or_create(
+            user=request.user,
+            defaults={'user_id': request.user.id}
+        )
+        serializer = self.get_serializer(cart)
+        return Response(serializer.data, 
+                       status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
     @extend_schema(
         summary="Get cart items",
