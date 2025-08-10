@@ -151,7 +151,9 @@ class CartViewSet(viewsets.ModelViewSet):
         """Update an existing cart item's quantity, color, or size"""
         cart = self.get_queryset().first()
         try:
-            item = cart.items.get(id=request.data.get('id'))
+            id = id = request.query_params.get('id')
+            print(f"Updating item with ID: {id}")
+            item = cart.items.get(id=id)
             serializer = CartItemSerializer(item, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()

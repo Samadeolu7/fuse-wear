@@ -7,8 +7,8 @@ class CartItemOutputSerializer(serializers.Serializer):
     """
     Serializer for cart item output representation.
     """
-    id = serializers.IntegerField(help_text="Cart item ID")
-    cartItemId = serializers.CharField(help_text="String representation of cart item ID")
+    id = serializers.IntegerField(help_text="Product ID")
+    cartItemId = serializers.IntegerField(help_text="Cart item ID for frontend use")
     name = serializers.CharField(help_text="Product name")
     price = serializers.CharField(help_text="Product price as string")
     description = serializers.CharField(help_text="Product description")
